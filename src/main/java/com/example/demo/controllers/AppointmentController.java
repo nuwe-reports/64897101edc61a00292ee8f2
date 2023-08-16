@@ -4,6 +4,7 @@ import com.example.demo.repositories.*;
 import com.example.demo.entities.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,13 +52,23 @@ public class AppointmentController {
     }
 
     @PostMapping("/appointment")
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment){
-        if (checkOverlapping(appointment)){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment){
+        if(appointment.getStartsAt().equals(appointment.getFinishesAt())){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Appointment savedAppointment = appointmentRepository.save(appointment);
-        return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
+        List<Appointment> allAppointments = appointmentRepository.findAll();
+
+        for (Appointment existingAppointment : allAppointments) {
+            if (appointment.overlaps(existingAppointment)) {
+                List<Appointment> conflictingAppointments = new ArrayList<>(Arrays.asList(appointment, existingAppointment));
+                return new ResponseEntity<>(conflictingAppointments, HttpStatus.NOT_ACCEPTABLE);
+            }
+        }
+
+        appointmentRepository.save(appointment);
+        return new ResponseEntity<>(allAppointments, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/appointments/{id}")
@@ -81,12 +92,5 @@ public class AppointmentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private boolean checkOverlapping(Appointment appointment) {
-        for (Appointment existingAppointment : appointmentRepository.findAll()) {
-            if (appointment.overlaps(existingAppointment)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }
