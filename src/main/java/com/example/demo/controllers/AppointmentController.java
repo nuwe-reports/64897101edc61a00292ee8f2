@@ -53,7 +53,9 @@ public class AppointmentController {
 
     @PostMapping("/appointment")
     public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment){
-        if(appointment.getStartsAt().equals(appointment.getFinishesAt())){
+        if(appointment.getStartsAt().equals(appointment.getFinishesAt()) ||
+                appointment.getFinishesAt().isBefore(appointment.getStartsAt())){
+
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -61,7 +63,7 @@ public class AppointmentController {
 
         for (Appointment existingAppointment : allAppointments) {
             if (appointment.overlaps(existingAppointment)) {
-                List<Appointment> conflictingAppointments = new ArrayList<>(Arrays.asList(appointment, existingAppointment));
+                List<Appointment> conflictingAppointments = Arrays.asList(appointment, existingAppointment);
                 return new ResponseEntity<>(conflictingAppointments, HttpStatus.NOT_ACCEPTABLE);
             }
         }

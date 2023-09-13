@@ -7,14 +7,10 @@ f
 6src/main/java/com/example/demo/ServletInitializer.java,4\e\4e2251e44eaa6348251aa91894c02b982b287bbb
 f
 6src/main/java/com/example/demo/TechhubApplication.java,7\4\743996e0f4010a02734167a3859bf760b683636c
-c
-3src/main/java/com/example/demo/entities/Person.java,1\7\17395b1c22266faabc1796548b1edf5c1c3f5ead
 H
 sonar-project.properties,2\5\2538046035efb77ecc44e1fd2eec1e2641594d4c
 7
 pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
-q
-Asrc/main/java/com/example/demo/repositories/DoctorRepository.java,b\c\bc2245a47f03ccdd6f373edc43f619eae26cf92f
 r
 Bsrc/main/java/com/example/demo/repositories/PatientRepository.java,a\3\a3eec11f0328f540e411d5319f11f3a623c33bdf
 o
@@ -29,3 +25,11 @@ n
 >src/main/java/com/example/demo/controllers/RoomController.java,b\b\bbb82de4e63fc91037048f35197cec04dc1cf675
 v
 Fsrc/main/java/com/example/demo/repositories/AppointmentRepository.java,6\d\6d006a747892e1a50bb38a6071e9c7b262751d7d
+h
+8src/test/java/com/example/demo/DemoApplicationTests.java,3\a\3a91846c75497f47092961a0e4c38ac82a456e51
+u
+Esrc/main/java/com/example/demo/controllers/AppointmentController.java,a\9\a95a20a9f199f39b001d0638e8146b770818755e
+q
+Asrc/main/java/com/example/demo/repositories/DoctorRepository.java,b\c\bc2245a47f03ccdd6f373edc43f619eae26cf92f
+f
+6src/test/java/com/example/demo/PatientJpaUnitTest.java,5\8\58158a6f242fb38bf8a30dbbd1651534ec093e5c
