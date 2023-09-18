@@ -56,7 +56,7 @@ class EntityUnitTest {
 
 
     @Test
-    void shouldCreateDoctorWithoutArguments() {
+    void shouldCreateDoctorWithNoArguments() {
         d1 = new Doctor();
 
         assertThat(d1).isNotNull();
@@ -123,7 +123,7 @@ class EntityUnitTest {
     }
 
     @Test
-    void shouldCreatePatientWithoutArguments() {
+    void shouldCreatePatientWithNoArguments() {
         p1 = new Patient();
 
         assertThat(p1).isNotNull();
@@ -186,7 +186,7 @@ class EntityUnitTest {
     }
 
     @Test
-    void shouldCreateRoomWithoutArguments() {
+    void shouldCreateRoomWithNoArguments() {
         r1 = new Room();
 
         assertThat(r1).isNotNull();
@@ -202,6 +202,163 @@ class EntityUnitTest {
     }
 
     //-- APPOINTMENT CLASS --
+    @Test
+    void shouldCreateAppointmentWithArguments() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        assertThat(a1).isNotNull();
+        assertThat(a1).hasNoNullFieldsOrProperties();
+    }
+
+    @Test
+    void shouldCreateAppointmentWithNoArguments() {
+        a1 = new Appointment();
+
+        assertThat(a1)
+                .hasAllNullFieldsOrPropertiesExcept("id");
+    }
+
+    @Test
+    void shouldGetAppointmentProperties() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime starts = LocalDate.now().atStartOfDay();
+        LocalDateTime finishes = starts.plusHours(1);
+        a1 = new Appointment(p1,d1,r1,starts,finishes);
+
+        Long id = a1.getId();
+        Doctor doctor = a1.getDoctor();
+        Patient patient= a1.getPatient();
+        Room room = a1.getRoom();
+        LocalDateTime startTime = a1.getStartsAt();
+        LocalDateTime finishTime = a1.getFinishesAt();
+
+        assertThat(id).isNotNull();
+        assertThat(doctor)
+                .hasFieldOrPropertyWithValue("firstName", "Juan");
+        assertThat(patient)
+                .hasFieldOrPropertyWithValue("firstName", "Marta");
+        assertThat(room)
+                .hasFieldOrPropertyWithValue("roomName", "Oncology");
+        assertThat(startTime).isNotNull();
+        assertThat(finishTime).isNotNull();
+    }
+
+    @Test
+    void shouldSetAppointmentProperties() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime starts = LocalDate.now().atStartOfDay();
+        LocalDateTime finishes = starts.plusHours(1);
+        Long id = 2L;
+
+        a1 = new Appointment();
+        a1.setId(id);
+        a1.setDoctor(d1);
+        a1.setPatient(p1);
+        a1.setRoom(r1);
+        a1.setStartsAt(starts);
+        a1.setFinishesAt(finishes);
+
+        assertThat(a1.getId()).isEqualTo(id);
+        assertThat(a1.getDoctor()).isEqualTo(d1);
+        assertThat(a1.getPatient()).isEqualTo(p1);
+        assertThat(a1.getRoom()).isEqualTo(r1);
+        assertThat(a1.getStartsAt()).isEqualTo(starts);
+        assertThat(a1.getFinishesAt()).isEqualTo(finishes);
+    }
+
+    @Test
+    void shouldOverlapsAppointment1_byStartTime() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        a2.setFinishesAt(startsAt.plusMinutes(30));
+
+        assertThat(a1.overlaps(a2));
+    }
+
+    @Test
+    void shouldOverlapsAppointment2_byFinishTime() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        a2.setStartsAt(startsAt.plusMinutes(30));
+
+        assertThat(a1.overlaps(a2));
+    }
+
+    @Test
+    void shouldOverlapsAppointment3_AStartsBeforeBFinishes_and_BFinishesBeforeAFinishes() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        a2.setStartsAt(startsAt.plusMinutes(20));
+        a2.setFinishesAt(finishesAt.minusMinutes(10));
+
+        assertThat(a1.overlaps(a2));
+    }
+
+    @Test
+    void shouldOverlapsAppointment4_BStartsBeforeAStarts_and_AFinishesBeforeBFinishes() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        a2.setStartsAt(startsAt.plusMinutes(10));
+        a2.setFinishesAt(finishesAt.plusMinutes(10));
+
+        assertThat(a1.overlaps(a2));
+    }
+
+    @Test
+    void shouldNotOverlapsAppointments() {
+        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+        r1 = new Room("Oncology");
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+
+        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        a2.setStartsAt(startsAt.plusHours(2));
+        a2.setFinishesAt(finishesAt.plusHours(2));
+
+        assertThat(a1.overlaps(a2)).isFalse();
+    }
+
 
 
 
@@ -262,4 +419,6 @@ class EntityUnitTest {
 //
 //        assertThat(age).isEqualTo(38);
 //    }
+
+
 }
