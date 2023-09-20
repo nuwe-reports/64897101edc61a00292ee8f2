@@ -54,7 +54,6 @@ class EntityUnitTest {
                 .hasFieldOrPropertyWithValue("email", "juan@mail.com");
     }
 
-
     @Test
     void shouldCreateDoctorWithNoArguments() {
         d1 = new Doctor();
@@ -343,7 +342,7 @@ class EntityUnitTest {
     }
 
     @Test
-    void shouldNotOverlapsAppointments() {
+    void shouldNotOverlapsAppointment() {
         d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
         p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
         r1 = new Room("Oncology");
