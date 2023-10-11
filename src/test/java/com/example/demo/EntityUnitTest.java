@@ -1,26 +1,23 @@
 package com.example.demo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import org.junit.jupiter.api.BeforeAll;
+import com.example.demo.entities.Appointment;
+import com.example.demo.entities.Doctor;
+import com.example.demo.entities.Patient;
+import com.example.demo.entities.Room;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import com.example.demo.entities.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace=Replace.NONE)
@@ -41,11 +38,24 @@ class EntityUnitTest {
     private Appointment a3;
 
 
-    //-- DOCTOR CLASS --
-    @Test
-    void shouldCreateDoctorWithArguments() {
+    @BeforeEach
+    public void setup() {
+
         d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
 
+        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
+
+        r1 = new Room("Oncology");
+
+        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
+        LocalDateTime finishesAt = startsAt.plusHours(1);
+
+        a1 = new Appointment(p1, d1, r1, startsAt, finishesAt);
+    }
+
+    //-- Doctor Class --
+    @Test
+    void shouldCreateDoctorWithArguments() {
         assertThat(d1.getId()).isNotNull();
         assertThat(d1)
                 .hasFieldOrPropertyWithValue("firstName", "Juan")
@@ -64,8 +74,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangeDoctorFirstName() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-
         d1.setFirstName("Carlos");
 
         assertThat(d1.getFirstName()).isEqualTo("Carlos");
@@ -73,8 +81,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangeDoctorLastName() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-
         d1.setLastName("Rodriguez");
 
         assertThat(d1.getLastName()).isEqualTo("Rodriguez");
@@ -82,8 +88,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangeDoctorAge() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-
         d1.setAge(22);
 
         assertThat(d1.getAge()).isEqualTo(22);
@@ -91,8 +95,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangeDoctorEmail() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-
         d1.setEmail("garciaJuan@mail.com");
 
         assertThat(d1.getEmail()).isEqualTo("garciaJuan@mail.com");
@@ -100,19 +102,25 @@ class EntityUnitTest {
 
     @Test
     void shouldChangeDoctorId() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-
         d1.setId(2);
 
         assertThat(d1.getId()).isEqualTo(2);
     }
 
+    @Test
+    void shouldSaveDoctor() {
+        Doctor savedDoctor = entityManager.persistAndFlush(d1);
 
-    //-- PATIENT CLASS --
+        assertThat(d1.getFirstName()).isEqualTo(savedDoctor.getFirstName());
+        assertThat(d1.getLastName()).isEqualTo(savedDoctor.getLastName());
+        assertThat(d1.getAge()).isEqualTo(savedDoctor.getAge());
+        assertThat(d1.getEmail()).isEqualTo(savedDoctor.getEmail());
+    }
+
+
+    //-- Patient Class --
     @Test
     void shouldCreatePatientWithArguments() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         assertThat(p1.getId()).isNotNull();
         assertThat(p1)
                 .hasFieldOrPropertyWithValue("firstName", "Marta")
@@ -131,8 +139,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangePatientFirstName() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         p1.setFirstName("Maria");
 
         assertThat(p1.getFirstName()).isEqualTo("Maria");
@@ -140,8 +146,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangePatientLastName() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         p1.setLastName("Rodriguez");
 
         assertThat(p1.getLastName()).isEqualTo("Rodriguez");
@@ -149,8 +153,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangePatientAge() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         p1.setAge(22);
 
         assertThat(p1.getAge()).isEqualTo(22);
@@ -158,8 +160,6 @@ class EntityUnitTest {
 
     @Test
     void shouldChangePatientEmail() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         p1.setEmail("sanchezMarta@mail.com");
 
         assertThat(p1.getEmail()).isEqualTo("sanchezMarta@mail.com");
@@ -167,19 +167,25 @@ class EntityUnitTest {
 
     @Test
     void shouldChangePatientId() {
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-
         p1.setId(2);
 
         assertThat(p1.getId()).isEqualTo(2);
     }
 
+    @Test
+    void shouldSavePatient() {
+        Patient savedPatient = entityManager.persistAndFlush(p1);
 
-    //-- ROOM CLASS --
+        assertThat(p1.getFirstName()).isEqualTo(savedPatient.getFirstName());
+        assertThat(p1.getLastName()).isEqualTo(savedPatient.getLastName());
+        assertThat(p1.getAge()).isEqualTo(savedPatient.getAge());
+        assertThat(p1.getEmail()).isEqualTo(savedPatient.getEmail());
+    }
+
+
+    //-- Room Class --
     @Test
     void shouldCreateRoomWithArguments() {
-        r1 = new Room("Oncology");
-
         assertThat(r1)
                 .hasFieldOrPropertyWithValue("roomName", "Oncology");
     }
@@ -193,24 +199,22 @@ class EntityUnitTest {
 
     @Test
     void shouldGetRoomName() {
-        r1 = new Room("Oncology");
-
         String roomName = r1.getRoomName();
 
         assertThat(roomName).isEqualTo("Oncology");
     }
 
-    //-- APPOINTMENT CLASS --
+    @Test
+    void shouldSaveRoom() {
+        Room savedRoom = entityManager.persistAndFlush(r1);
+
+        assertThat(r1.getRoomName()).isEqualTo(savedRoom.getRoomName());
+    }
+
+
+    //-- Appointment Class --
     @Test
     void shouldCreateAppointmentWithArguments() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
-
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-
         assertThat(a1).isNotNull();
         assertThat(a1).hasNoNullFieldsOrProperties();
     }
@@ -225,13 +229,6 @@ class EntityUnitTest {
 
     @Test
     void shouldGetAppointmentProperties() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime starts = LocalDate.now().atStartOfDay();
-        LocalDateTime finishes = starts.plusHours(1);
-        a1 = new Appointment(p1,d1,r1,starts,finishes);
-
         Long id = a1.getId();
         Doctor doctor = a1.getDoctor();
         Patient patient= a1.getPatient();
@@ -252,10 +249,7 @@ class EntityUnitTest {
 
     @Test
     void shouldSetAppointmentProperties() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime starts = LocalDate.now().atStartOfDay();
+        LocalDateTime starts = LocalDate.now().atStartOfDay().plusHours(1);
         LocalDateTime finishes = starts.plusHours(1);
         Long id = 2L;
 
@@ -277,147 +271,88 @@ class EntityUnitTest {
 
     @Test
     void shouldOverlapsAppointment1_byStartTime() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
+        Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
+        Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
 
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        LocalDateTime startsAt2 = a1.getStartsAt();
+        LocalDateTime finishesAt2 = a1.getFinishesAt();
 
-        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-        a2.setFinishesAt(startsAt.plusMinutes(30));
+        a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
+        a2.setFinishesAt(finishesAt2.plusMinutes(30));
 
         assertThat(a1.overlaps(a2));
     }
 
     @Test
     void shouldOverlapsAppointment2_byFinishTime() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
+        Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
+        Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
 
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        LocalDateTime startsAt2 = a1.getStartsAt();
+        LocalDateTime finishesAt2 = a1.getFinishesAt();
 
-        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-        a2.setStartsAt(startsAt.plusMinutes(30));
+        a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
+        a2.setStartsAt(startsAt2.plusMinutes(30));
 
         assertThat(a1.overlaps(a2));
     }
 
     @Test
     void shouldOverlapsAppointment3_AStartsBeforeBFinishes_and_BFinishesBeforeAFinishes() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
+        Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
+        Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
 
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        LocalDateTime startsAt2 = a1.getStartsAt();
+        LocalDateTime finishesAt2 = a1.getFinishesAt();
 
-        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-        a2.setStartsAt(startsAt.plusMinutes(20));
-        a2.setFinishesAt(finishesAt.minusMinutes(10));
+        a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
+        a2.setStartsAt(startsAt2.plusMinutes(20));
+        a2.setFinishesAt(finishesAt2.minusMinutes(10));
 
         assertThat(a1.overlaps(a2));
     }
 
     @Test
     void shouldOverlapsAppointment4_BStartsBeforeAStarts_and_AFinishesBeforeBFinishes() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
+        Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
+        Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
 
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        LocalDateTime startsAt2 = a1.getStartsAt();
+        LocalDateTime finishesAt2 = a1.getFinishesAt();
 
-        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-        a2.setStartsAt(startsAt.plusMinutes(10));
-        a2.setFinishesAt(finishesAt.plusMinutes(10));
+
+        a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
+        a2.setStartsAt(startsAt2.plusMinutes(10));
+        a2.setFinishesAt(finishesAt2.plusMinutes(10));
 
         assertThat(a1.overlaps(a2));
     }
 
     @Test
     void shouldNotOverlapsAppointment() {
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-        r1 = new Room("Oncology");
-        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-        LocalDateTime finishesAt = startsAt.plusHours(1);
+        Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
+        Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
 
-        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
+        LocalDateTime startsAt2 = a1.getStartsAt();
+        LocalDateTime finishesAt2 = a1.getFinishesAt();
 
-        a2 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-        a2.setStartsAt(startsAt.plusHours(2));
-        a2.setFinishesAt(finishesAt.plusHours(2));
+        a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
+        a2.setStartsAt(startsAt2.plusHours(2));
+        a2.setFinishesAt(finishesAt2.plusHours(2));
 
         assertThat(a1.overlaps(a2)).isFalse();
     }
 
+    @Test
+    void testSaveAppointment() {
+        Appointment savedAppointment = entityManager.persistAndFlush(a1);
 
+        assertThat(p1).isEqualTo(savedAppointment.getPatient());
+        assertThat(d1).isEqualTo(savedAppointment.getDoctor());
+        assertThat(r1).isEqualTo(savedAppointment.getRoom());
+        assertThat(a1.getStartsAt()).isEqualTo(savedAppointment.getStartsAt());
+        assertThat(a1.getFinishesAt()).isEqualTo(savedAppointment.getFinishesAt());
 
-
-
-
-    /** TODO
-     * Implement tests for each Entity class: Doctor, Patient, Room and Appointment.
-     * Make sure you are as exhaustive as possible. Coverage is checked ;)
-     */
-
-
-    //    @BeforeAll
-//    void setup() {
-//        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-//        p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
-//        r1 = new Room("Oncology");
-//        LocalDateTime startsAt = LocalDate.now().atStartOfDay();
-//        LocalDateTime finishesAt = startsAt.plusHours(1);
-//        a1 = new Appointment(p1,d1,r1,startsAt,finishesAt);
-//
-//    }
-
-//    @Test
-//    void should_create_doctor(){
-//        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-//        Doctor savedDoctor = entityManager.persist(d1);
-//        System.out.println(d1.getId());
-//
-//        assertThat(savedDoctor.getId()).isNotNull();
-//        assertThat(savedDoctor.getFirstName().equals("Juan"));
-//        assertThat(savedDoctor.getLastName().equals("Garcia"));
-//        assertThat(savedDoctor.getEmail().equals("jaun@gmail.com"));
-//    }
-
-    //    @Test
-//    void shouldGetDoctorFirstName() {
-//        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-//
-//        String firstName = d1.getFirstName();
-//
-//        assertThat(firstName).isEqualTo("Juan");
-//    }
-//
-//    @Test
-//    void shouldGetDoctorLastName() {
-//        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-//
-//        String lastName = d1.getLastName();
-//
-//        assertThat(lastName).isEqualTo("Garcia");
-//    }
-//
-//    @Test
-//    void shouldGetDoctorAge() {
-//        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-//
-//        int age = d1.getAge();
-//
-//        assertThat(age).isEqualTo(38);
-//    }
-
+    }
 
 }

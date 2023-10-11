@@ -1,24 +1,16 @@
 
 package com.example.demo;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import java.time.LocalDateTime;
-import java.time.format.*;
-
+import com.example.demo.controllers.DoctorController;
+import com.example.demo.controllers.PatientController;
+import com.example.demo.controllers.RoomController;
+import com.example.demo.entities.Doctor;
+import com.example.demo.entities.Patient;
+import com.example.demo.entities.Room;
+import com.example.demo.repositories.DoctorRepository;
+import com.example.demo.repositories.PatientRepository;
+import com.example.demo.repositories.RoomRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +19,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import com.example.demo.controllers.*;
-import com.example.demo.repositories.*;
-import com.example.demo.entities.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 
@@ -60,9 +55,10 @@ class DoctorControllerUnitTest{
 
         mockMvc.perform(post("/api/doctor").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(doctor)))
-                .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(doctor.getAge())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(doctor.getAge())))
+                .andExpect(status().isCreated());
+
 
     }
 
@@ -71,11 +67,17 @@ class DoctorControllerUnitTest{
         Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
         doctor.setId(1);
         Optional<Doctor> opt = Optional.of(doctor);
+
+        assertThat(opt).isPresent();
+        assertThat(opt.get().getId()).isEqualTo(doctor.getId());
+        assertThat(doctor.getId()).isEqualTo(1);
+
         when(doctorRepository.findById(doctor.getId())).thenReturn(opt);
 
         mockMvc.perform(get("/api/doctors/" + doctor.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())))
+                .andExpect(status().isOk());
+
     }
 
     @Test
@@ -98,12 +100,12 @@ class DoctorControllerUnitTest{
         when(doctorRepository.findAll()).thenReturn(doctors);
 
         mockMvc.perform(get("/api/doctors"))
-                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()", CoreMatchers.is(doctors.size())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].firstName", CoreMatchers.is(doctors.get(0).getFirstName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].age", CoreMatchers.is(doctors.get(0).getAge())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].firstName", CoreMatchers.is(doctors.get(1).getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].age", CoreMatchers.is(doctors.get(1).getAge())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].age", CoreMatchers.is(doctors.get(1).getAge())))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -169,9 +171,10 @@ class PatientControllerUnitTest{
 
         mockMvc.perform(post("/api/patient").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
-                .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(patient.getAge())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(patient.getAge())))
+                .andExpect(status().isCreated());
+
 
     }
 
@@ -184,8 +187,9 @@ class PatientControllerUnitTest{
         when(patientRepository.findById(patient.getId())).thenReturn(opt);
 
         mockMvc.perform(get("/api/patients/" + patient.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())))
+                .andExpect(status().isOk());
+
 
     }
 
@@ -208,12 +212,13 @@ class PatientControllerUnitTest{
 
         when(patientRepository.findAll()).thenReturn(patients);
         mockMvc.perform(get("/api/patients"))
-                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()", CoreMatchers.is(patients.size())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].firstName", CoreMatchers.is(patients.get(0).getFirstName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].age", CoreMatchers.is(patients.get(0).getAge())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].firstName", CoreMatchers.is(patients.get(1).getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].age", CoreMatchers.is(patients.get(1).getAge())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].age", CoreMatchers.is(patients.get(1).getAge())))
+                .andExpect(status().isOk());
+
 
     }
 
@@ -280,8 +285,9 @@ class RoomControllerUnitTest{
 
         mockMvc.perform(post("/api/room").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(room)))
-                .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())))
+                .andExpect(status().isCreated());
+
     }
 
     @Test
@@ -292,8 +298,9 @@ class RoomControllerUnitTest{
 
         when(roomRepository.findByRoomName(room.getRoomName())).thenReturn(opt);
         mockMvc.perform(get("/api/rooms/" + room.getRoomName()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())))
+                .andExpect(status().isOk());
+
 
     }
 
@@ -316,10 +323,11 @@ class RoomControllerUnitTest{
 
         when(roomRepository.findAll()).thenReturn(rooms);
         mockMvc.perform(get("/api/rooms"))
-                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()", CoreMatchers.is(rooms.size())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].roomName", CoreMatchers.is(rooms.get(0).getRoomName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].roomName", CoreMatchers.is(rooms.get(1).getRoomName())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].roomName", CoreMatchers.is(rooms.get(1).getRoomName())))
+                .andExpect(status().isOk());
+
     }
 
     @Test

@@ -7,8 +7,6 @@ w
 G.idea/sonarlint/issuestore/2/5/2538046035efb77ecc44e1fd2eec1e2641594d4c,9\0\9054ed2a97cd2291a3213d6a974bbe1d4a589da5
 h
 8src/test/java/com/example/demo/DemoApplicationTests.java,3\a\3a91846c75497f47092961a0e4c38ac82a456e51
-e
-5src/test/java/com/example/demo/DoctorJpaUnitTest.java,e\2\e289002e7c4d638387526415b06f9826ac505256
 f
 6src/test/java/com/example/demo/PatientJpaUnitTest.java,5\8\58158a6f242fb38bf8a30dbbd1651534ec093e5c
 :
