@@ -38,13 +38,13 @@ jobs:
         if: always()
         run: ./mvnw test -Dtest="EntityUnitTest, DoctorControllerUnitTest, PatientControllerUnitTest, RoomControllerUnitTest" -l phase2.out -fn
 
-      - name: Phase 4-1 . Build Dockerfile.mysql image.
+      - name: Phase 4-1 . Build Dockerfile.mysql.mysql image.
         if: always()
-        run: docker build . --file Dockerfile.mysql --tag accwe-hospital:$(date +%s) 2>/dev/null; last=$?;res="FAILURE"; if [[ $last -eq 0 ]]; then res="SUCCESS";fi; echo $res > phase4-1.out
+        run: docker build . --file Dockerfile.mysql.mysql --tag accwe-hospital:$(date +%s) 2>/dev/null; last=$?;res="FAILURE"; if [[ $last -eq 0 ]]; then res="SUCCESS";fi; echo $res > phase4-1.out
 
-      - name: Phase 4-2. Build Dockerfile.maven image.
+      - name: Phase 4-2. Build Dockerfile.mysql.maven image.
         if: always()
-        run: docker build . --file Dockerfile.maven --tag accwe-api:$(date +%s) 2>/dev/null; last=$?;res="FAILURE"; if [[ $last -eq 0 ]]; then res="SUCCESS";fi; echo $res > phase4-2.out
+        run: docker build . --file Dockerfile.mysql.maven --tag accwe-api:$(date +%s) 2>/dev/null; last=$?;res="FAILURE"; if [[ $last -eq 0 ]]; then res="SUCCESS";fi; echo $res > phase4-2.out
 
       - uses: actions/setup-node@v3
         if: always()
