@@ -1,6 +1,4 @@
 
-9
-	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 H
 sonar-project.properties,2\5\2538046035efb77ecc44e1fd2eec1e2641594d4c
 w
@@ -48,9 +46,3 @@ p
 @src/main/java/com/example/demo/controllers/DoctorController.java,b\7\b78140238794ae6b3b484e86c960bdfd1df4c93b
 a
 1src/main/java/com/example/demo/entities/Room.java,4\3\438c8ea43a23dd99a619fa927639bf4dbd02ffb3
-@
-Dockerfile.maven,5\4\547dc446b0cb4658ccfd56e881db63242cd82039
-@
-Dockerfile.mysql,3\0\30f50ebdb824a0ce43bf436319c3a802167c9029
-B
-docker-compose.yml,3\5\35b8c13cf2eb2a194eada000eb310d65aed53b2a

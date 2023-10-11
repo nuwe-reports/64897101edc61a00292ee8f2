@@ -1,26 +1,24 @@
 version: "3.8"
 services:
-  nuwe-chall-api:
+  microservice-api:
     build:
       context: .
       dockerfile: Dockerfile.maven
     image: nuwe-chall-api-image:v1
-    container_name: nuwe-chall-api-container
+    container_name: microservice-container
     ports:
       - "8080:8080"
     depends_on:
-      - nuwe-chall-mysqldb
-    environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://nuwe-chall-mysqldb:3306/accwe-hospital"
+      - mysql-db
     networks:
       - nuwe-chall-net
 
-  nuwe-chall-mysqldb:
+  mysql-db:
     build:
       context: .
       dockerfile: Dockerfile.mysql
     image: nuwe-chall-db-image:v1
-    container_name: nuwe-chall-db-container
+    container_name: mysql-container
     ports:
       - "3307:3306"
     networks:

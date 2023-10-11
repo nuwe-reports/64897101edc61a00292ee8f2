@@ -1,6 +1,4 @@
 
-9
-	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 H
 sonar-project.properties,2\5\2538046035efb77ecc44e1fd2eec1e2641594d4c
 w
@@ -48,9 +46,3 @@ j
 :src/test/java/com/example/demo/AppointmentJpaUnitTest.java,1\1\11bcb547d7ad02424f83ee4c122f6fe8822e08a1
 d
 4src/main/java/com/example/demo/entities/Patient.java,1\9\193e1edae31ea98c842f2d710ba383e6105628f5
-B
-docker-compose.yml,3\5\35b8c13cf2eb2a194eada000eb310d65aed53b2a
-@
-Dockerfile.mysql,3\0\30f50ebdb824a0ce43bf436319c3a802167c9029
-@
-Dockerfile.maven,5\4\547dc446b0cb4658ccfd56e881db63242cd82039
