@@ -4,6 +4,7 @@ import com.example.demo.repositories.*;
 import com.example.demo.entities.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,13 +53,25 @@ public class AppointmentController {
 
     @PostMapping("/appointment")
     public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment){
-        /** TODO 
-         * Implement this function, which acts as the POST /api/appointment endpoint.
-         * Make sure to check out the whole project. Specially the Appointment.java class
-         */
-        return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
-    }
+        if(appointment.getStartsAt().equals(appointment.getFinishesAt()) ||
+                appointment.getFinishesAt().isBefore(appointment.getStartsAt())){
 
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        List<Appointment> allAppointments = appointmentRepository.findAll();
+
+        for (Appointment existingAppointment : allAppointments) {
+            if (appointment.overlaps(existingAppointment)) {
+                List<Appointment> conflictingAppointments = Arrays.asList(appointment, existingAppointment);
+                return new ResponseEntity<>(conflictingAppointments, HttpStatus.NOT_ACCEPTABLE);
+            }
+        }
+
+        appointmentRepository.save(appointment);
+        return new ResponseEntity<>(allAppointments, HttpStatus.OK);
+
+    }
 
     @DeleteMapping("/appointments/{id}")
     public ResponseEntity<HttpStatus> deleteAppointment(@PathVariable("id") long id){
@@ -80,5 +93,6 @@ public class AppointmentController {
         appointmentRepository.deleteAll();
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
 }
