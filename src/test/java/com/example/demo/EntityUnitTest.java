@@ -5,6 +5,7 @@ import com.example.demo.entities.Doctor;
 import com.example.demo.entities.Patient;
 import com.example.demo.entities.Room;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -24,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(Lifecycle.PER_CLASS)
 class EntityUnitTest {
 
-	@Autowired
+
+    @Autowired
 	private TestEntityManager entityManager;
 
 	private Doctor d1;
@@ -37,11 +39,16 @@ class EntityUnitTest {
     private Appointment a2;
     private Appointment a3;
 
+    private final String DOCTOR_FIRST_NAME = "Juan";
+    private final String DOCTOR_LAST_NAME = "Garcia";
+    private final int DOCTOR_AGE = 38;
+    private final String DOCTOR_EMAIL = "juan@mail.com";
+
 
     @BeforeEach
     public void setup() {
 
-        d1 = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        d1 = new Doctor(DOCTOR_FIRST_NAME, DOCTOR_LAST_NAME, DOCTOR_AGE, DOCTOR_EMAIL);
 
         p1 = new Patient("Marta", "Sanchez", 27, "marta@mail.com");
 
@@ -53,69 +60,111 @@ class EntityUnitTest {
         a1 = new Appointment(p1, d1, r1, startsAt, finishesAt);
     }
 
-    //-- Doctor Class --
-    @Test
-    void shouldCreateDoctorWithArguments() {
-        assertThat(d1.getId()).isNotNull();
-        assertThat(d1)
-                .hasFieldOrPropertyWithValue("firstName", "Juan")
-                .hasFieldOrPropertyWithValue("lastName", "Garcia")
-                .hasFieldOrPropertyWithValue("age", 38)
-                .hasFieldOrPropertyWithValue("email", "juan@mail.com");
+    @Nested
+    class DoctorEntityTest {
+        @Test
+        void shouldCreateDoctorWithArguments() {
+            assertThat(d1.getId()).isGreaterThan(0L);
+            assertThat(d1)
+                    .hasFieldOrPropertyWithValue("firstName", DOCTOR_FIRST_NAME)
+                    .hasFieldOrPropertyWithValue("lastName", DOCTOR_LAST_NAME)
+                    .hasFieldOrPropertyWithValue("age", DOCTOR_AGE)
+                    .hasFieldOrPropertyWithValue("email", DOCTOR_EMAIL);
+        }
+
+        @Test
+        void shouldCreateDoctorWithNoArguments() {
+            d1 = new Doctor();
+
+            assertThat(d1).isNotNull();
+            assertThat(d1.getId()).isGreaterThan(0L);
+        }
+
+        @Test
+        void shouldSetValuesInDoctorTest() {
+            d1.setFirstName("Kike");
+            d1.setLastName("Perez");
+            d1.setEmail("new@mail.com");
+            d1.setAge(77);
+            entityManager.persistAndFlush(d1);
+
+            assertThat(d1.getId()).isGreaterThan(0);
+            assertThat(d1.getFirstName()).isEqualTo("Kike");
+            assertThat(d1.getLastName()).isEqualTo("Perez");
+            assertThat(d1.getEmail()).isEqualTo("new@mail.com");
+            assertThat(d1.getAge()).isEqualTo(77);
+        }
+
+        @Test
+        void shouldChangeDoctorFirstName() {
+            d1.setFirstName("Carlos");
+
+            assertThat(d1.getFirstName()).isEqualTo("Carlos");
+        }
+
+        @Test
+        void shouldChangeDoctorLastName() {
+            d1.setLastName("Rodriguez");
+
+            assertThat(d1.getLastName()).isEqualTo("Rodriguez");
+        }
+
+        @Test
+        void shouldChangeDoctorAge() {
+            d1.setAge(22);
+
+            assertThat(d1.getAge()).isEqualTo(22);
+        }
+
+        @Test
+        void shouldChangeDoctorEmail() {
+            d1.setEmail("garciaJuan@mail.com");
+
+            assertThat(d1.getEmail()).isEqualTo("garciaJuan@mail.com");
+        }
+
+        @Test
+        void shouldChangeDoctorId() {
+            d1.setId(2);
+
+            assertThat(d1.getId()).isEqualTo(2);
+        }
+
+        @Test
+        void shouldSaveDoctor() {
+            Doctor savedDoctor = entityManager.persistAndFlush(d1);
+
+            assertThat(savedDoctor.getFirstName()).isEqualTo(DOCTOR_FIRST_NAME);
+            assertThat(savedDoctor.getLastName()).isEqualTo(DOCTOR_LAST_NAME);
+            assertThat(savedDoctor.getAge()).isEqualTo(DOCTOR_AGE);
+            assertThat(savedDoctor.getEmail()).isEqualTo(DOCTOR_EMAIL);
+        }
+
+        @Test
+        void shouldGetDoctorFromDatabaseTest() {
+            Doctor savedDoctor = entityManager.persistAndFlush(d1);
+
+            Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
+            assertThat(retrievedDoctor).isEqualTo(savedDoctor);
+        }
+
+//        @Test
+//        void doctorFieldsNotEmptyOrNullTest() {
+//
+//            Assertions.assertNotNull(d1);
+//            Assertions.assertNotNull(d1.getFirstName());
+//            Assertions.assertNotNull(d1.getLastName());
+//            Assertions.assertTrue(p1.getAge() > 0);
+//            Assertions.assertNotNull(d1.getEmail());
+//
+//            Assertions.assertNotEquals("", d1.getFirstName());
+//            Assertions.assertNotEquals("", d1.getLastName());
+//            Assertions.assertTrue(p1.getAge() > 0);
+//            Assertions.assertNotEquals("", d1.getEmail());
+//        }
+
     }
 
-    @Test
-    void shouldCreateDoctorWithNoArguments() {
-        d1 = new Doctor();
-
-        assertThat(d1).isNotNull();
-        assertThat(d1.getId()).isNotNull();
-    }
-
-    @Test
-    void shouldChangeDoctorFirstName() {
-        d1.setFirstName("Carlos");
-
-        assertThat(d1.getFirstName()).isEqualTo("Carlos");
-    }
-
-    @Test
-    void shouldChangeDoctorLastName() {
-        d1.setLastName("Rodriguez");
-
-        assertThat(d1.getLastName()).isEqualTo("Rodriguez");
-    }
-
-    @Test
-    void shouldChangeDoctorAge() {
-        d1.setAge(22);
-
-        assertThat(d1.getAge()).isEqualTo(22);
-    }
-
-    @Test
-    void shouldChangeDoctorEmail() {
-        d1.setEmail("garciaJuan@mail.com");
-
-        assertThat(d1.getEmail()).isEqualTo("garciaJuan@mail.com");
-    }
-
-    @Test
-    void shouldChangeDoctorId() {
-        d1.setId(2);
-
-        assertThat(d1.getId()).isEqualTo(2);
-    }
-
-    @Test
-    void shouldSaveDoctor() {
-        Doctor savedDoctor = entityManager.persistAndFlush(d1);
-
-        assertThat(d1.getFirstName()).isEqualTo(savedDoctor.getFirstName());
-        assertThat(d1.getLastName()).isEqualTo(savedDoctor.getLastName());
-        assertThat(d1.getAge()).isEqualTo(savedDoctor.getAge());
-        assertThat(d1.getEmail()).isEqualTo(savedDoctor.getEmail());
-    }
 
 
     //-- Patient Class --
