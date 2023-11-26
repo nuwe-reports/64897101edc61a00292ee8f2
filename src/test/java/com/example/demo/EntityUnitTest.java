@@ -199,7 +199,7 @@ class EntityUnitTest {
         void shouldCreateRoomWithNoArguments() {
             r1 = new Room();
 
-            assertThat(r1).isNotNull();
+            assertThat(r1.getRoomName()).isNull();
         }
 
         @Test

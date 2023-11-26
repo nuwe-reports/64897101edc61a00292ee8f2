@@ -40,6 +40,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DoctorController.class)
 class DoctorControllerUnitTest {
 
+    private static final String DOCTOR_FIRST_NAME = "Juan";
+    private static final String DOCTOR_LAST_NAME = "Garcia";
+    private static final String DOCTOR_EMAIL = "juan@mail.com";
+    private static final int DOCTOR_AGE = 38;
+
+    private static final String DOCTOR_FIRST_NAME2 = "Marta";
+    private static final String DOCTOR_LAST_NAME2 = "Gonzales";
+    private static final String DOCTOR_EMAIL2 = "marta@mail.com";
+    private static final int DOCTOR_AGE2 = 52;
+
     @MockBean
     private DoctorRepository doctorRepository;
 
@@ -51,7 +61,7 @@ class DoctorControllerUnitTest {
 
     @Test
     void shouldCreateDoctor() throws Exception {
-        Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        Doctor doctor = new Doctor(DOCTOR_FIRST_NAME, DOCTOR_LAST_NAME, DOCTOR_AGE, DOCTOR_EMAIL);
 
         mockMvc.perform(post("/api/doctor").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(doctor)))
@@ -64,18 +74,19 @@ class DoctorControllerUnitTest {
 
     @Test
     void shouldGetDoctorById() throws Exception {
-        Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        Doctor doctor = new Doctor(DOCTOR_FIRST_NAME, DOCTOR_LAST_NAME, DOCTOR_AGE, DOCTOR_EMAIL);
         doctor.setId(1);
         Optional<Doctor> opt = Optional.of(doctor);
 
-        assertThat(opt).isPresent();
-        assertThat(opt.get().getId()).isEqualTo(doctor.getId());
         assertThat(doctor.getId()).isEqualTo(1);
 
         when(doctorRepository.findById(doctor.getId())).thenReturn(opt);
 
         mockMvc.perform(get("/api/doctors/" + doctor.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(doctor.getLastName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(doctor.getAge())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(doctor.getEmail())))
                 .andExpect(status().isOk());
     }
 
@@ -90,8 +101,8 @@ class DoctorControllerUnitTest {
 
     @Test
     void shouldGetTwoDoctors() throws Exception {
-        Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
-        Doctor doctor2 = new Doctor("Marta", "Gonzales", 52, "marta@mail.com");
+        Doctor doctor = new Doctor(DOCTOR_FIRST_NAME, DOCTOR_LAST_NAME, DOCTOR_AGE, DOCTOR_EMAIL);
+        Doctor doctor2 = new Doctor(DOCTOR_FIRST_NAME2, DOCTOR_LAST_NAME2, DOCTOR_AGE2, DOCTOR_EMAIL2);
 
         List<Doctor> doctors = new ArrayList<>();
         doctors.add(doctor);
@@ -119,13 +130,11 @@ class DoctorControllerUnitTest {
 
     @Test
     void shouldDeleteDoctorById() throws Exception {
-        Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
+        Doctor doctor = new Doctor(DOCTOR_FIRST_NAME, DOCTOR_LAST_NAME, DOCTOR_AGE, DOCTOR_EMAIL);
         doctor.setId(1);
 
         Optional<Doctor> opt = Optional.of(doctor);
 
-        assertThat(opt).isPresent();
-        assertThat(opt.get().getId()).isEqualTo(doctor.getId());
         assertThat(doctor.getId()).isEqualTo(1);
 
         when(doctorRepository.findById(doctor.getId())).thenReturn(opt);
@@ -156,6 +165,15 @@ class DoctorControllerUnitTest {
 
 @WebMvcTest(PatientController.class)
 class PatientControllerUnitTest {
+    private static final String PATIENT_FIRST_NAME = "Carlos";
+    private static final String PATIENT_LAST_NAME = "Lopez";
+    private static final String PATIENT_EMAIL = "carlos@mail.com";
+    private static final int PATIENT_AGE = 34;
+
+    private static final String PATIENT_FIRST_NAME2 = "Maria";
+    private static final String PATIENT_LAST_NAME2 = "Fuente";
+    private static final String PATIENT_EMAIL2 = "maria@mail.com";
+    private static final int PATIENT_AGE2 = 63;
 
     @MockBean
     private PatientRepository patientRepository;
@@ -168,7 +186,7 @@ class PatientControllerUnitTest {
 
     @Test
     void shouldCreatePatient() throws Exception {
-        Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
+        Patient patient = new Patient(PATIENT_FIRST_NAME, PATIENT_LAST_NAME, PATIENT_AGE, PATIENT_EMAIL);
 
         mockMvc.perform(post("/api/patient").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
@@ -181,18 +199,19 @@ class PatientControllerUnitTest {
 
     @Test
     void shouldGetPatientById() throws Exception {
-        Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
+        Patient patient = new Patient(PATIENT_FIRST_NAME, PATIENT_LAST_NAME, PATIENT_AGE, PATIENT_EMAIL);
         patient.setId(1);
         Optional<Patient> opt = Optional.of(patient);
 
-        assertThat(opt).isPresent();
-        assertThat(opt.get().getId()).isEqualTo(patient.getId());
         assertThat(patient.getId()).isEqualTo(1);
 
         when(patientRepository.findById(patient.getId())).thenReturn(opt);
 
         mockMvc.perform(get("/api/patients/" + patient.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(patient.getLastName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(patient.getAge())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(patient.getEmail())))
                 .andExpect(status().isOk());
     }
 
@@ -208,8 +227,8 @@ class PatientControllerUnitTest {
 
     @Test
     void shouldGetTwoPatients() throws Exception {
-        Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
-        Patient patient2 = new Patient("Marta", "Gonzales", 52, "marta@mail.com");
+        Patient patient = new Patient(PATIENT_FIRST_NAME, PATIENT_LAST_NAME, PATIENT_AGE, PATIENT_EMAIL);
+        Patient patient2 = new Patient(PATIENT_FIRST_NAME2, PATIENT_LAST_NAME2, PATIENT_AGE2, PATIENT_EMAIL2);
 
         List<Patient> patients = new ArrayList<>();
         patients.add(patient);
@@ -237,13 +256,10 @@ class PatientControllerUnitTest {
 
     @Test
     void shouldDeletePatientById() throws Exception {
-        Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
+        Patient patient = new Patient(PATIENT_FIRST_NAME, PATIENT_LAST_NAME, PATIENT_AGE, PATIENT_EMAIL);
         patient.setId(1);
 
         Optional<Patient> opt = Optional.of(patient);
-
-        assertThat(opt).isPresent();
-        assertThat(opt.get().getId()).isEqualTo(patient.getId());
         assertThat(patient.getId()).isEqualTo(1);
 
         when(patientRepository.findById(patient.getId())).thenReturn(opt);
@@ -263,7 +279,6 @@ class PatientControllerUnitTest {
                 .andExpect(status().isNotFound());
     }
 
-
     @Test
     void shouldDeleteAllPatients() throws Exception {
         doNothing().when(patientRepository).deleteAll();
@@ -276,6 +291,9 @@ class PatientControllerUnitTest {
 @WebMvcTest(RoomController.class)
 class RoomControllerUnitTest {
 
+    public static final String ROOM_NAME = "Oncology";
+    public static final String ROOM_NAME2 = "Rx";
+
     @MockBean
     private RoomRepository roomRepository;
 
@@ -287,7 +305,7 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldCreateRoom() throws Exception {
-        Room room = new Room("Oncology");
+        Room room = new Room(ROOM_NAME);
 
         mockMvc.perform(post("/api/room").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(room)))
@@ -297,7 +315,7 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldGetRoomByName() throws Exception {
-        Room room = new Room("Oncology");
+        Room room = new Room(ROOM_NAME);
 
         Optional<Room> opt = Optional.of(room);
 
@@ -309,7 +327,7 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldNotGetRoomByName() throws Exception {
-        String roomName = "Rx";
+        String roomName = ROOM_NAME2;
 
         when(roomRepository.findByRoomName(roomName)).thenReturn(Optional.empty());
         mockMvc.perform(get("/api/rooms/" + roomName))
@@ -318,8 +336,8 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldGetTwoRooms() throws Exception {
-        Room room = new Room("Oncology");
-        Room room2 = new Room("Rx");
+        Room room = new Room(ROOM_NAME);
+        Room room2 = new Room(ROOM_NAME2);
         List<Room> rooms = new ArrayList<>();
         rooms.add(room);
         rooms.add(room2);
@@ -343,7 +361,7 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldDeleteRoomByRoomName() throws Exception {
-        Room room = new Room("Oncology");
+        Room room = new Room(ROOM_NAME);
 
         Optional<Room> opt = Optional.of(room);
 
@@ -359,7 +377,7 @@ class RoomControllerUnitTest {
 
     @Test
     void shouldNotDeleteRoom() throws Exception {
-        String roomName = "Rx";
+        String roomName = ROOM_NAME2;
         when(roomRepository.findByRoomName(roomName)).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/rooms/" + roomName))
