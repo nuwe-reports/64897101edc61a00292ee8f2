@@ -53,24 +53,30 @@ public class AppointmentController {
 
     @PostMapping("/appointment")
     public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment){
-        if(appointment.getStartsAt().equals(appointment.getFinishesAt()) ||
-                appointment.getFinishesAt().isBefore(appointment.getStartsAt())){
 
+        if (isInvalidStartAndFinish(appointment)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         List<Appointment> allAppointments = appointmentRepository.findAll();
 
-        for (Appointment existingAppointment : allAppointments) {
-            if (appointment.overlaps(existingAppointment)) {
-                List<Appointment> conflictingAppointments = Arrays.asList(appointment, existingAppointment);
-                return new ResponseEntity<>(conflictingAppointments, HttpStatus.NOT_ACCEPTABLE);
-            }
+        if (isConflict(appointment, allAppointments)) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         appointmentRepository.save(appointment);
+        allAppointments.add(appointment);
         return new ResponseEntity<>(allAppointments, HttpStatus.OK);
 
+    }
+
+    private boolean isInvalidStartAndFinish(Appointment newAppointment) {
+        return newAppointment.getStartsAt().equals(newAppointment.getFinishesAt()) ||
+                newAppointment.getFinishesAt().isBefore(newAppointment.getStartsAt());
+    }
+
+    private boolean isConflict(Appointment newAppointment, List<Appointment> existingAppointments) {
+        return existingAppointments.stream().anyMatch(newAppointment::overlaps);
     }
 
     @DeleteMapping("/appointments/{id}")
