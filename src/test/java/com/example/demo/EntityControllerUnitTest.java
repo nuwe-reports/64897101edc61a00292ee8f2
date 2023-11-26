@@ -31,26 +31,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-
-/** TODO
+/**
+ * TODO
  * Implement all the unit test in its corresponding class.
  * Make sure to be as exhaustive as possible. Coverage is checked ;)
  */
 
 @WebMvcTest(DoctorController.class)
-class DoctorControllerUnitTest{
+class DoctorControllerUnitTest {
 
     @MockBean
     private DoctorRepository doctorRepository;
 
-    @Autowired 
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateDoctor() throws Exception{
+    void shouldCreateDoctor() throws Exception {
         Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
 
         mockMvc.perform(post("/api/doctor").contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldGetDoctorById() throws Exception{
+    void shouldGetDoctorById() throws Exception {
         Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
         doctor.setId(1);
         Optional<Doctor> opt = Optional.of(doctor);
@@ -80,7 +80,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldNotGetAnyDoctorById() throws Exception{
+    void shouldNotGetAnyDoctorById() throws Exception {
         long id = 23;
         when(doctorRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -89,7 +89,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldGetTwoDoctors() throws Exception{
+    void shouldGetTwoDoctors() throws Exception {
         Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
         Doctor doctor2 = new Doctor("Marta", "Gonzales", 52, "marta@mail.com");
 
@@ -109,7 +109,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldNotGetDoctors() throws Exception{
+    void shouldNotGetDoctors() throws Exception {
         List<Doctor> doctors = new ArrayList<>();
         when(doctorRepository.findAll()).thenReturn(doctors);
 
@@ -118,7 +118,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldDeleteDoctorById() throws Exception{
+    void shouldDeleteDoctorById() throws Exception {
         Doctor doctor = new Doctor("Juan", "Garcia", 38, "juan@mail.com");
         doctor.setId(1);
 
@@ -136,7 +136,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldNotDeleteDoctorById() throws Exception{
+    void shouldNotDeleteDoctorById() throws Exception {
         long id = 23;
 
         when(doctorRepository.findById(id)).thenReturn(Optional.empty());
@@ -145,7 +145,7 @@ class DoctorControllerUnitTest{
     }
 
     @Test
-    void shouldDeleteAllDoctors() throws Exception{
+    void shouldDeleteAllDoctors() throws Exception {
         doNothing().when(doctorRepository).deleteAll();
 
         mockMvc.perform(delete("/api/doctors"))
@@ -155,19 +155,19 @@ class DoctorControllerUnitTest{
 }
 
 @WebMvcTest(PatientController.class)
-class PatientControllerUnitTest{
+class PatientControllerUnitTest {
 
     @MockBean
     private PatientRepository patientRepository;
 
-    @Autowired 
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreatePatient() throws Exception{
+    void shouldCreatePatient() throws Exception {
         Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
 
         mockMvc.perform(post("/api/patient").contentType(MediaType.APPLICATION_JSON)
@@ -180,7 +180,7 @@ class PatientControllerUnitTest{
     }
 
     @Test
-    void shouldGetPatientById() throws Exception{
+    void shouldGetPatientById() throws Exception {
         Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
         patient.setId(1);
         Optional<Patient> opt = Optional.of(patient);
@@ -207,7 +207,7 @@ class PatientControllerUnitTest{
     }
 
     @Test
-    void shouldGetTwoPatients() throws Exception{
+    void shouldGetTwoPatients() throws Exception {
         Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
         Patient patient2 = new Patient("Marta", "Gonzales", 52, "marta@mail.com");
 
@@ -226,7 +226,7 @@ class PatientControllerUnitTest{
     }
 
     @Test
-    void shouldNotGetPatients() throws Exception{
+    void shouldNotGetPatients() throws Exception {
         List<Patient> patients = new ArrayList<>();
 
         when(patientRepository.findAll()).thenReturn(patients);
@@ -236,7 +236,7 @@ class PatientControllerUnitTest{
     }
 
     @Test
-    void shouldDeletePatientById() throws Exception{
+    void shouldDeletePatientById() throws Exception {
         Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
         patient.setId(1);
 
@@ -254,7 +254,7 @@ class PatientControllerUnitTest{
     }
 
     @Test
-    void shouldNotDeletePatientById() throws Exception{
+    void shouldNotDeletePatientById() throws Exception {
         long id = 23;
 
         when(patientRepository.findById(id)).thenReturn(Optional.empty());
@@ -264,9 +264,8 @@ class PatientControllerUnitTest{
     }
 
 
-
     @Test
-    void shouldDeleteAllPatients() throws Exception{
+    void shouldDeleteAllPatients() throws Exception {
         doNothing().when(patientRepository).deleteAll();
         mockMvc.perform(delete("/api/patients"))
                 .andExpect(status().isOk());
@@ -275,19 +274,19 @@ class PatientControllerUnitTest{
 }
 
 @WebMvcTest(RoomController.class)
-class RoomControllerUnitTest{
+class RoomControllerUnitTest {
 
     @MockBean
     private RoomRepository roomRepository;
 
-    @Autowired 
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldCreateRoom() throws Exception{
+    void shouldCreateRoom() throws Exception {
         Room room = new Room("Oncology");
 
         mockMvc.perform(post("/api/room").contentType(MediaType.APPLICATION_JSON)
@@ -297,7 +296,7 @@ class RoomControllerUnitTest{
     }
 
     @Test
-    void shouldGetRoomByName() throws Exception{
+    void shouldGetRoomByName() throws Exception {
         Room room = new Room("Oncology");
 
         Optional<Room> opt = Optional.of(room);
@@ -309,7 +308,7 @@ class RoomControllerUnitTest{
     }
 
     @Test
-    void shouldNotGetRoomByName() throws Exception{
+    void shouldNotGetRoomByName() throws Exception {
         String roomName = "Rx";
 
         when(roomRepository.findByRoomName(roomName)).thenReturn(Optional.empty());
@@ -359,7 +358,7 @@ class RoomControllerUnitTest{
     }
 
     @Test
-    void shouldNotDeleteRoom() throws Exception{
+    void shouldNotDeleteRoom() throws Exception {
         String roomName = "Rx";
         when(roomRepository.findByRoomName(roomName)).thenReturn(Optional.empty());
 
@@ -368,7 +367,7 @@ class RoomControllerUnitTest{
     }
 
     @Test
-    void shouldDeleteAllRooms() throws Exception{
+    void shouldDeleteAllRooms() throws Exception {
         doNothing().when(roomRepository).deleteAll();
         mockMvc.perform(delete("/api/rooms"))
                 .andExpect(status().isOk());

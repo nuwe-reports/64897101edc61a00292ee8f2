@@ -21,28 +21,28 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace=Replace.NONE)
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
 class EntityUnitTest {
 
-    private final String DOCTOR_FIRST_NAME = "Juan";
-    private final String DOCTOR_LAST_NAME = "Garcia";
-    private final int DOCTOR_AGE = 38;
-    private final String DOCTOR_EMAIL = "juan@mail.com";
+    private static final String DOCTOR_FIRST_NAME = "Juan";
+    private static final String DOCTOR_LAST_NAME = "Garcia";
+    private static final int DOCTOR_AGE = 38;
+    private static final String DOCTOR_EMAIL = "juan@mail.com";
 
-    private final String PATIENT_FIRST_NAME = "Marta";
-    private final String PATIENT_LAST_NAME = "Sanchez";
-    private final int PATIENT_AGE = 27;
-    private final String PATIENT_EMAIL = "marta@mail.com";
+    private static final String PATIENT_FIRST_NAME = "Marta";
+    private static final String PATIENT_LAST_NAME = "Sanchez";
+    private static final int PATIENT_AGE = 27;
+    private static final String PATIENT_EMAIL = "marta@mail.com";
 
-    private final String ROOM_NAME = "Oncology";
+    private static final String ROOM_NAME = "Oncology";
 
     @Autowired
-	private TestEntityManager entityManager;
+    private TestEntityManager entityManager;
 
-	private Doctor d1;
+    private Doctor d1;
 
-	private Patient p1;
+    private Patient p1;
 
     private Room r1;
 
@@ -145,14 +145,14 @@ class EntityUnitTest {
         void shouldSetPatientValuesTest() {
             p1.setFirstName("Maria");
             p1.setLastName("Rodriguez");
-            p1.setEmail("sanchezMarta@mail.com");
+            p1.setEmail("rodriguezMaria@mail.com");
             p1.setAge(22);
             entityManager.persistAndFlush(p1);
 
             assertThat(p1.getId()).isPositive();
             assertThat(p1.getFirstName()).isEqualTo("Maria");
             assertThat(p1.getLastName()).isEqualTo("Rodriguez");
-            assertThat(p1.getEmail()).isEqualTo("sanchezMarta@mail.com");
+            assertThat(p1.getEmail()).isEqualTo("rodriguezMaria@mail.com");
             assertThat(p1.getAge()).isEqualTo(22);
         }
 
@@ -176,11 +176,18 @@ class EntityUnitTest {
             entityManager.persistAndFlush(r1);
 
             assertThat(r1)
-                    .hasFieldOrPropertyWithValue("roomName", "Oncology");
+                    .hasFieldOrPropertyWithValue("roomName", ROOM_NAME);
         }
 
         @Test
-        void shouldSaveRoom() {
+        void shouldCreateRoomWithNoArguments() {
+            r1 = new Room();
+
+            assertThat(r1).isNotNull();
+        }
+
+        @Test
+        void ShouldGetSavedRoom() {
             Room savedRoom = entityManager.persistAndFlush(r1);
             Room retrievedRoom = entityManager.find(Room.class, r1.getRoomName());
 
@@ -235,7 +242,7 @@ class EntityUnitTest {
         void shouldGetAppointmentProperties() {
             Long id = a1.getId();
             Doctor doctor = a1.getDoctor();
-            Patient patient= a1.getPatient();
+            Patient patient = a1.getPatient();
             Room room = a1.getRoom();
             LocalDateTime startTime = a1.getStartsAt();
             LocalDateTime finishTime = a1.getFinishesAt();
