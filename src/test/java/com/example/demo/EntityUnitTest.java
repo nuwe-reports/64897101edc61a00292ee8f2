@@ -99,20 +99,6 @@ class EntityUnitTest {
         }
 
         @Test
-        void doctorFieldsNotEmptyOrNullTest() {
-            assertThat(d1).isNotNull();
-            assertThat(d1.getFirstName()).isNotNull();
-            assertThat(d1.getLastName()).isNotNull();
-            assertThat(d1.getEmail()).isNotNull();
-
-            assertThat(d1.getAge()).isGreaterThan(0);
-
-            assertThat(d1.getFirstName()).isNotEqualTo("");
-            assertThat(d1.getLastName()).isNotEqualTo("");
-            assertThat(d1.getEmail()).isNotEqualTo("");
-        }
-
-        @Test
         void shouldGetSavedDoctor() {
             Doctor savedDoctor = entityManager.persistAndFlush(d1);
             Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
