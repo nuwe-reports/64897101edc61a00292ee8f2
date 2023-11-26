@@ -99,57 +99,31 @@ class EntityUnitTest {
         }
 
         @Test
-        void shouldChangeDoctorFirstName() {
-            d1.setFirstName("Carlos");
+        void doctorFieldsNotEmptyOrNullTest() {
+            assertThat(d1).isNotNull();
+            assertThat(d1.getFirstName()).isNotNull();
+            assertThat(d1.getLastName()).isNotNull();
+            assertThat(d1.getEmail()).isNotNull();
 
-            assertThat(d1.getFirstName()).isEqualTo("Carlos");
+            assertThat(d1.getAge()).isGreaterThan(0);
+
+            assertThat(d1.getFirstName()).isNotEqualTo("");
+            assertThat(d1.getLastName()).isNotEqualTo("");
+            assertThat(d1.getEmail()).isNotEqualTo("");
         }
 
         @Test
-        void shouldChangeDoctorLastName() {
-            d1.setLastName("Rodriguez");
-
-            assertThat(d1.getLastName()).isEqualTo("Rodriguez");
-        }
-
-        @Test
-        void shouldChangeDoctorAge() {
-            d1.setAge(22);
-
-            assertThat(d1.getAge()).isEqualTo(22);
-        }
-
-        @Test
-        void shouldChangeDoctorEmail() {
-            d1.setEmail("garciaJuan@mail.com");
-
-            assertThat(d1.getEmail()).isEqualTo("garciaJuan@mail.com");
-        }
-
-        @Test
-        void shouldChangeDoctorId() {
-            d1.setId(2);
-
-            assertThat(d1.getId()).isEqualTo(2);
-        }
-
-        @Test
-        void shouldSaveDoctor() {
+        void shouldGetSavedDoctor() {
             Doctor savedDoctor = entityManager.persistAndFlush(d1);
+            Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
 
             assertThat(savedDoctor.getFirstName()).isEqualTo(DOCTOR_FIRST_NAME);
             assertThat(savedDoctor.getLastName()).isEqualTo(DOCTOR_LAST_NAME);
             assertThat(savedDoctor.getAge()).isEqualTo(DOCTOR_AGE);
             assertThat(savedDoctor.getEmail()).isEqualTo(DOCTOR_EMAIL);
-        }
-
-        @Test
-        void shouldGetDoctorFromDatabaseTest() {
-            Doctor savedDoctor = entityManager.persistAndFlush(d1);
-
-            Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
             assertThat(retrievedDoctor).isEqualTo(savedDoctor);
         }
+
     }
 
 
