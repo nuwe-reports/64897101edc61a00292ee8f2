@@ -65,8 +65,7 @@ public class AppointmentController {
         }
 
         appointmentRepository.save(appointment);
-        allAppointments = appointmentRepository.findAll();
-
+        allAppointments.add(appointment);
         return new ResponseEntity<>(allAppointments, HttpStatus.OK);
 
     }
