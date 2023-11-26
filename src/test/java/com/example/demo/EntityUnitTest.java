@@ -64,7 +64,9 @@ class EntityUnitTest {
     class DoctorEntityTest {
         @Test
         void shouldCreateDoctorWithArguments() {
-            assertThat(d1.getId()).isGreaterThan(0L);
+            entityManager.persistAndFlush(d1);
+
+            assertThat(d1.getId()).isPositive();
             assertThat(d1)
                     .hasFieldOrPropertyWithValue("firstName", DOCTOR_FIRST_NAME)
                     .hasFieldOrPropertyWithValue("lastName", DOCTOR_LAST_NAME)
@@ -75,9 +77,10 @@ class EntityUnitTest {
         @Test
         void shouldCreateDoctorWithNoArguments() {
             d1 = new Doctor();
+            entityManager.persistAndFlush(d1);
 
             assertThat(d1).isNotNull();
-            assertThat(d1.getId()).isGreaterThan(0L);
+            assertThat(d1.getId()).isPositive();
         }
 
         @Test
@@ -88,7 +91,7 @@ class EntityUnitTest {
             d1.setAge(77);
             entityManager.persistAndFlush(d1);
 
-            assertThat(d1.getId()).isGreaterThan(0);
+            assertThat(d1.getId()).isPositive();
             assertThat(d1.getFirstName()).isEqualTo("Kike");
             assertThat(d1.getLastName()).isEqualTo("Perez");
             assertThat(d1.getEmail()).isEqualTo("new@mail.com");
@@ -147,24 +150,7 @@ class EntityUnitTest {
             Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
             assertThat(retrievedDoctor).isEqualTo(savedDoctor);
         }
-
-//        @Test
-//        void doctorFieldsNotEmptyOrNullTest() {
-//
-//            Assertions.assertNotNull(d1);
-//            Assertions.assertNotNull(d1.getFirstName());
-//            Assertions.assertNotNull(d1.getLastName());
-//            Assertions.assertTrue(p1.getAge() > 0);
-//            Assertions.assertNotNull(d1.getEmail());
-//
-//            Assertions.assertNotEquals("", d1.getFirstName());
-//            Assertions.assertNotEquals("", d1.getLastName());
-//            Assertions.assertTrue(p1.getAge() > 0);
-//            Assertions.assertNotEquals("", d1.getEmail());
-//        }
-
     }
-
 
 
     //-- Patient Class --
