@@ -64,6 +64,8 @@ class EntityUnitTest {
     class DoctorEntityTest {
         @Test
         void shouldCreateDoctorWithArguments() {
+            entityManager.persistAndFlush(d1);
+
             assertThat(d1.getId()).isPositive();
             assertThat(d1)
                     .hasFieldOrPropertyWithValue("firstName", DOCTOR_FIRST_NAME)
@@ -75,6 +77,7 @@ class EntityUnitTest {
         @Test
         void shouldCreateDoctorWithNoArguments() {
             d1 = new Doctor();
+            entityManager.persistAndFlush(d1);
 
             assertThat(d1).isNotNull();
             assertThat(d1.getId()).isPositive();
@@ -147,6 +150,7 @@ class EntityUnitTest {
             Doctor retrievedDoctor = entityManager.find(Doctor.class, savedDoctor.getId());
             assertThat(retrievedDoctor).isEqualTo(savedDoctor);
         }
+    }
 
 
     //-- Patient Class --
