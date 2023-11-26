@@ -91,18 +91,26 @@ class EntityUnitTest {
         }
 
         @Test
-        void shouldSetDoctorValuesTest() {
-            d1.setFirstName("Kike");
-            d1.setLastName("Perez");
-            d1.setEmail("perezkike@mail.com");
-            d1.setAge(77);
-            entityManager.persistAndFlush(d1);
+        void shouldSetDoctorValues() {
+            final long EXPECTED_ID = 1L;
+            final String NEW_FIRST_NAME = "Kike";
+            final String NEW_LAST_NAME = "Perez";
+            final int NEW_AGE = 77;
+            final String NEW_EMAIL = "perezkike@mail.com";
 
-            assertThat(d1.getId()).isPositive();
-            assertThat(d1.getFirstName()).isEqualTo("Kike");
-            assertThat(d1.getLastName()).isEqualTo("Perez");
-            assertThat(d1.getEmail()).isEqualTo("perezkike@mail.com");
-            assertThat(d1.getAge()).isEqualTo(77);
+            d1.setFirstName(NEW_FIRST_NAME);
+            d1.setLastName(NEW_LAST_NAME);
+            d1.setAge(NEW_AGE);
+            d1.setEmail(NEW_EMAIL);
+
+            entityManager.persistAndFlush(d1);
+            d1.setId(EXPECTED_ID);
+
+            assertThat(d1.getId()).isEqualTo(EXPECTED_ID);
+            assertThat(d1.getFirstName()).isEqualTo(NEW_FIRST_NAME);
+            assertThat(d1.getLastName()).isEqualTo(NEW_LAST_NAME);
+            assertThat(d1.getAge()).isEqualTo(NEW_AGE);
+            assertThat(d1.getEmail()).isEqualTo(NEW_EMAIL);
         }
 
         @Test
@@ -142,18 +150,26 @@ class EntityUnitTest {
         }
 
         @Test
-        void shouldSetPatientValuesTest() {
-            p1.setFirstName("Maria");
-            p1.setLastName("Rodriguez");
-            p1.setEmail("rodriguezMaria@mail.com");
-            p1.setAge(22);
-            entityManager.persistAndFlush(p1);
+        void shouldSetPatientValues() {
+            final long EXPECTED_ID = 1L;
+            final String NEW_FIRST_NAME = "Maria";
+            final String NEW_LAST_NAME = "Rodriguez";
+            final int NEW_AGE = 22;
+            final String NEW_EMAIL = "rodriguezMaria@mail.com";
 
-            assertThat(p1.getId()).isPositive();
-            assertThat(p1.getFirstName()).isEqualTo("Maria");
-            assertThat(p1.getLastName()).isEqualTo("Rodriguez");
-            assertThat(p1.getEmail()).isEqualTo("rodriguezMaria@mail.com");
-            assertThat(p1.getAge()).isEqualTo(22);
+            p1.setFirstName(NEW_FIRST_NAME);
+            p1.setLastName(NEW_LAST_NAME);
+            p1.setAge(NEW_AGE);
+            p1.setEmail(NEW_EMAIL);
+
+            entityManager.persistAndFlush(p1);
+            p1.setId(EXPECTED_ID);
+
+            assertThat(p1.getId()).isEqualTo(EXPECTED_ID);
+            assertThat(p1.getFirstName()).isEqualTo(NEW_FIRST_NAME);
+            assertThat(p1.getLastName()).isEqualTo(NEW_LAST_NAME);
+            assertThat(p1.getAge()).isEqualTo(NEW_AGE);
+            assertThat(p1.getEmail()).isEqualTo(NEW_EMAIL);
         }
 
         @Test
@@ -204,7 +220,19 @@ class EntityUnitTest {
             entityManager.persistAndFlush(a1);
 
             assertThat(a1).isNotNull();
-            assertThat(a1).hasNoNullFieldsOrProperties();
+            assertThat(a1)
+                    .hasFieldOrPropertyWithValue("doctor.firstName", DOCTOR_FIRST_NAME)
+                    .hasFieldOrPropertyWithValue("doctor.lastName", DOCTOR_LAST_NAME)
+                    .hasFieldOrPropertyWithValue("doctor.age", DOCTOR_AGE)
+                    .hasFieldOrPropertyWithValue("doctor.email", DOCTOR_EMAIL)
+
+                    .hasFieldOrPropertyWithValue("patient.firstName", PATIENT_FIRST_NAME)
+                    .hasFieldOrPropertyWithValue("patient.lastName", PATIENT_LAST_NAME)
+                    .hasFieldOrPropertyWithValue("patient.age", PATIENT_AGE)
+                    .hasFieldOrPropertyWithValue("patient.email", PATIENT_EMAIL)
+
+                    .hasFieldOrPropertyWithValue("room.roomName", ROOM_NAME);
+
         }
 
         @Test
@@ -236,26 +264,6 @@ class EntityUnitTest {
             assertThat(a1.getRoom()).isEqualTo(r1);
             assertThat(a1.getStartsAt()).isEqualTo(starts);
             assertThat(a1.getFinishesAt()).isEqualTo(finishes);
-        }
-
-        @Test
-        void shouldGetAppointmentProperties() {
-            Long id = a1.getId();
-            Doctor doctor = a1.getDoctor();
-            Patient patient = a1.getPatient();
-            Room room = a1.getRoom();
-            LocalDateTime startTime = a1.getStartsAt();
-            LocalDateTime finishTime = a1.getFinishesAt();
-
-            assertThat(id).isNotNull();
-            assertThat(doctor)
-                    .hasFieldOrPropertyWithValue("firstName", DOCTOR_FIRST_NAME);
-            assertThat(patient)
-                    .hasFieldOrPropertyWithValue("firstName", PATIENT_FIRST_NAME);
-            assertThat(room)
-                    .hasFieldOrPropertyWithValue("roomName", ROOM_NAME);
-            assertThat(startTime).isNotNull();
-            assertThat(finishTime).isNotNull();
         }
 
         @Test
@@ -299,6 +307,13 @@ class EntityUnitTest {
             a3.setFinishesAt(someTime.plusMinutes(15));
             assertThat(a1.overlaps(a2)).isTrue();
             assertThat(a1.overlaps(a3)).isTrue();
+
+            // Case 5: A Does Not overlap with B
+            a1.setStartsAt(someTime);
+            a1.setFinishesAt(someTime.plusHours(1));
+            a2.setStartsAt(someTime.plusHours(2));
+            a2.setFinishesAt(someTime.plusHours(3));
+            assertThat(a1.overlaps(a2)).isFalse();
         }
     }
 
