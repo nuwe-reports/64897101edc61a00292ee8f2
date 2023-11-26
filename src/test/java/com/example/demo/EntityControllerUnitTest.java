@@ -56,10 +56,10 @@ class DoctorControllerUnitTest{
         mockMvc.perform(post("/api/doctor").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(doctor)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(doctor.getLastName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(doctor.getAge())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(doctor.getEmail())))
                 .andExpect(status().isCreated());
-
-
     }
 
     @Test
@@ -77,12 +77,12 @@ class DoctorControllerUnitTest{
         mockMvc.perform(get("/api/doctors/" + doctor.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(doctor.getFirstName())))
                 .andExpect(status().isOk());
-
     }
 
     @Test
     void shouldNotGetAnyDoctorById() throws Exception{
         long id = 23;
+        when(doctorRepository.findById(id)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/doctors/" + id))
                 .andExpect(status().isNotFound());
@@ -139,6 +139,7 @@ class DoctorControllerUnitTest{
     void shouldNotDeleteDoctorById() throws Exception{
         long id = 23;
 
+        when(doctorRepository.findById(id)).thenReturn(Optional.empty());
         mockMvc.perform(delete("/api/doctors/" + id))
                 .andExpect(status().isNotFound());
     }
@@ -172,30 +173,34 @@ class PatientControllerUnitTest{
         mockMvc.perform(post("/api/patient").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(patient.getLastName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(patient.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.age", CoreMatchers.is(patient.getAge())))
                 .andExpect(status().isCreated());
-
-
     }
 
     @Test
     void shouldGetPatientById() throws Exception{
         Patient patient = new Patient("Carlos", "Lopez", 34, "carlos@mail.com");
         patient.setId(1);
-
         Optional<Patient> opt = Optional.of(patient);
+
+        assertThat(opt).isPresent();
+        assertThat(opt.get().getId()).isEqualTo(patient.getId());
+        assertThat(patient.getId()).isEqualTo(1);
+
         when(patientRepository.findById(patient.getId())).thenReturn(opt);
 
         mockMvc.perform(get("/api/patients/" + patient.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(patient.getFirstName())))
                 .andExpect(status().isOk());
-
-
     }
 
     @Test
-    void shouldNotGetAnyPatientById() throws Exception{
+    void shouldNotGetAnyPatientById() throws Exception {
         long id = 23;
+
+        when(patientRepository.findById(id)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/patients/" + id))
                 .andExpect(status().isNotFound());
@@ -218,8 +223,6 @@ class PatientControllerUnitTest{
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].firstName", CoreMatchers.is(patients.get(1).getFirstName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].age", CoreMatchers.is(patients.get(1).getAge())))
                 .andExpect(status().isOk());
-
-
     }
 
     @Test
@@ -254,9 +257,13 @@ class PatientControllerUnitTest{
     void shouldNotDeletePatientById() throws Exception{
         long id = 23;
 
+        when(patientRepository.findById(id)).thenReturn(Optional.empty());
+
         mockMvc.perform(delete("/api/patients/" + id))
                 .andExpect(status().isNotFound());
     }
+
+
 
     @Test
     void shouldDeleteAllPatients() throws Exception{
@@ -287,7 +294,6 @@ class RoomControllerUnitTest{
                         .content(objectMapper.writeValueAsString(room)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())))
                 .andExpect(status().isCreated());
-
     }
 
     @Test
@@ -300,8 +306,6 @@ class RoomControllerUnitTest{
         mockMvc.perform(get("/api/rooms/" + room.getRoomName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roomName", CoreMatchers.is(room.getRoomName())))
                 .andExpect(status().isOk());
-
-
     }
 
     @Test
@@ -327,7 +331,6 @@ class RoomControllerUnitTest{
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].roomName", CoreMatchers.is(rooms.get(0).getRoomName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].roomName", CoreMatchers.is(rooms.get(1).getRoomName())))
                 .andExpect(status().isOk());
-
     }
 
     @Test
@@ -358,6 +361,8 @@ class RoomControllerUnitTest{
     @Test
     void shouldNotDeleteRoom() throws Exception{
         String roomName = "Rx";
+        when(roomRepository.findByRoomName(roomName)).thenReturn(Optional.empty());
+
         mockMvc.perform(delete("/api/rooms/" + roomName))
                 .andExpect(status().isNotFound());
     }
