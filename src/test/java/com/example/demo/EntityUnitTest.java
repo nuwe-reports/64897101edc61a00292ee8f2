@@ -63,6 +63,8 @@ class EntityUnitTest {
         LocalDateTime finishesAt = startsAt.plusHours(1);
 
         a1 = new Appointment(p1, d1, r1, startsAt, finishesAt);
+        a2 = new Appointment(p1, d1, r1, startsAt, finishesAt);
+        a3 = new Appointment(p1, d1, r1, startsAt, finishesAt);
     }
 
     @Nested
@@ -192,6 +194,8 @@ class EntityUnitTest {
     class AppointmentEntityTest {
         @Test
         void shouldCreateAppointmentWithArguments() {
+            entityManager.persistAndFlush(a1);
+
             assertThat(a1).isNotNull();
             assertThat(a1).hasNoNullFieldsOrProperties();
         }
@@ -199,33 +203,14 @@ class EntityUnitTest {
         @Test
         void shouldCreateAppointmentWithNoArguments() {
             a1 = new Appointment();
+            entityManager.persistAndFlush(a1);
 
             assertThat(a1)
                     .hasAllNullFieldsOrPropertiesExcept("id");
         }
 
         @Test
-        void shouldGetAppointmentProperties() {
-            Long id = a1.getId();
-            Doctor doctor = a1.getDoctor();
-            Patient patient= a1.getPatient();
-            Room room = a1.getRoom();
-            LocalDateTime startTime = a1.getStartsAt();
-            LocalDateTime finishTime = a1.getFinishesAt();
-
-            assertThat(id).isNotNull();
-            assertThat(doctor)
-                    .hasFieldOrPropertyWithValue("firstName", "Juan");
-            assertThat(patient)
-                    .hasFieldOrPropertyWithValue("firstName", "Marta");
-            assertThat(room)
-                    .hasFieldOrPropertyWithValue("roomName", "Oncology");
-            assertThat(startTime).isNotNull();
-            assertThat(finishTime).isNotNull();
-        }
-
-        @Test
-        void shouldSetAppointmentProperties() {
+        void shouldSetAppointmentValues() {
             LocalDateTime starts = LocalDate.now().atStartOfDay().plusHours(1);
             LocalDateTime finishes = starts.plusHours(1);
             Long id = 2L;
@@ -247,92 +232,67 @@ class EntityUnitTest {
         }
 
         @Test
-        void shouldOverlapsAppointment1_byStartTime() {
-            Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
-            Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
+        void shouldGetAppointmentProperties() {
+            Long id = a1.getId();
+            Doctor doctor = a1.getDoctor();
+            Patient patient= a1.getPatient();
+            Room room = a1.getRoom();
+            LocalDateTime startTime = a1.getStartsAt();
+            LocalDateTime finishTime = a1.getFinishesAt();
 
-            LocalDateTime startsAt2 = a1.getStartsAt();
-            LocalDateTime finishesAt2 = a1.getFinishesAt();
-
-            a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
-            a2.setFinishesAt(finishesAt2.plusMinutes(30));
-
-            assertThat(a1.overlaps(a2));
+            assertThat(id).isNotNull();
+            assertThat(doctor)
+                    .hasFieldOrPropertyWithValue("firstName", DOCTOR_FIRST_NAME);
+            assertThat(patient)
+                    .hasFieldOrPropertyWithValue("firstName", PATIENT_FIRST_NAME);
+            assertThat(room)
+                    .hasFieldOrPropertyWithValue("roomName", ROOM_NAME);
+            assertThat(startTime).isNotNull();
+            assertThat(finishTime).isNotNull();
         }
 
         @Test
-        void shouldOverlapsAppointment2_byFinishTime() {
-            Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
-            Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
-
-            LocalDateTime startsAt2 = a1.getStartsAt();
-            LocalDateTime finishesAt2 = a1.getFinishesAt();
-
-            a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
-            a2.setStartsAt(startsAt2.plusMinutes(30));
-
-            assertThat(a1.overlaps(a2));
-        }
-
-        @Test
-        void shouldOverlapsAppointment3_AStartsBeforeBFinishes_and_BFinishesBeforeAFinishes() {
-            Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
-            Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
-
-            LocalDateTime startsAt2 = a1.getStartsAt();
-            LocalDateTime finishesAt2 = a1.getFinishesAt();
-
-            a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
-            a2.setStartsAt(startsAt2.plusMinutes(20));
-            a2.setFinishesAt(finishesAt2.minusMinutes(10));
-
-            assertThat(a1.overlaps(a2));
-        }
-
-        @Test
-        void shouldOverlapsAppointment4_BStartsBeforeAStarts_and_AFinishesBeforeBFinishes() {
-            Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
-            Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
-
-            LocalDateTime startsAt2 = a1.getStartsAt();
-            LocalDateTime finishesAt2 = a1.getFinishesAt();
-
-
-            a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
-            a2.setStartsAt(startsAt2.plusMinutes(10));
-            a2.setFinishesAt(finishesAt2.plusMinutes(10));
-
-            assertThat(a1.overlaps(a2));
-        }
-
-        @Test
-        void shouldNotOverlapsAppointment() {
-            Doctor d2 = new Doctor("Hugo", "Lopez", 46, "hugo@mail.com");
-            Patient p2 = new Patient("Rosana", "Fuentes", 23, "rosana@mail.com");
-
-            LocalDateTime startsAt2 = a1.getStartsAt();
-            LocalDateTime finishesAt2 = a1.getFinishesAt();
-
-            a2 = new Appointment(p1,d1,r1,startsAt2,finishesAt2);
-            a2.setStartsAt(startsAt2.plusHours(2));
-            a2.setFinishesAt(finishesAt2.plusHours(2));
-
-            assertThat(a1.overlaps(a2)).isFalse();
-        }
-
-        @Test
-        void testSaveAppointment() {
+        void shouldGetSavedAppointment() {
             Appointment savedAppointment = entityManager.persistAndFlush(a1);
+            Appointment retrieveAppointment = entityManager.find(Appointment.class, savedAppointment.getId());
 
             assertThat(p1).isEqualTo(savedAppointment.getPatient());
             assertThat(d1).isEqualTo(savedAppointment.getDoctor());
             assertThat(r1).isEqualTo(savedAppointment.getRoom());
             assertThat(a1.getStartsAt()).isEqualTo(savedAppointment.getStartsAt());
             assertThat(a1.getFinishesAt()).isEqualTo(savedAppointment.getFinishesAt());
+            assertThat(retrieveAppointment).isEqualTo(savedAppointment);
 
         }
 
-    }
+        @Test
+        void overlapCasesTest() {
+            LocalDateTime someTime = LocalDate.now().atStartOfDay();
+            // Case 1: A.starts == B.starts
+            a1.setStartsAt(someTime);
+            a2.setStartsAt(someTime);
+            assertThat(a1.overlaps(a2)).isTrue();
 
+            // Case 2: A.finishes == B.finishes
+            a2.setFinishesAt(someTime);
+            a3.setFinishesAt(someTime);
+            assertThat(a2.overlaps(a3)).isTrue();
+
+            // Case 3: A.starts < B.finishes && B.finishes < A.finishes
+            a1.setStartsAt(someTime);
+            a2.setFinishesAt(someTime.plusMinutes(30));
+            a3.setStartsAt(someTime.plusMinutes(15));
+            assertThat(a1.overlaps(a2)).isTrue();
+            assertThat(a2.overlaps(a3)).isTrue();
+
+            // Case 4: B.starts < A.starts && A.finishes < B.finishes
+            a1.setStartsAt(someTime);
+            a1.setFinishesAt(someTime.plusMinutes(30));
+            a2.setStartsAt(someTime.minusMinutes(15));
+            a3.setFinishesAt(someTime.plusMinutes(15));
+            assertThat(a1.overlaps(a2)).isTrue();
+            assertThat(a1.overlaps(a3)).isTrue();
+        }
+    }
 
 }
